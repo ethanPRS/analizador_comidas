@@ -37,6 +37,21 @@ Nodo envolver(string etiqueta, Nodo hijo) {
 Nodo analizarAcomp();
 
 
+// -- MENSAJE CUANDO NO LLEGA LA BEBIDA --
+string razonFaltaBebida(const string &categoria) {
+    if (categoria == "PROTEINA") return "solo se permite una proteina, y va al inicio";
+    if (categoria == "GUARN1")   return "las guarniciones tipo 1 van antes que las de tipo 2, "
+                                        "antes de entradas/sopas/postres, y solo se permite una";
+    if (categoria == "GUARN2")   return "solo se permite una guarnicion tipo 2, "
+                                        "y va antes de entradas/sopas/postres";
+    if (categoria == "SOPA" || categoria == "ENTRADA")
+                                 return "solo se permite una entrada o sopa, y va antes del postre";
+    if (categoria == "POSTRE")   return "solo se permite un postre";
+    if (categoria == "Y")        return "hay un '+' de mas";
+    if (categoria == "FIN")      return "falta la bebida al final";
+    return "se esperaba una bebida";
+}
+
 Nodo analizarComida() {
     Nodo comida = Nodo{"<Comida>", {}};
 
@@ -53,6 +68,10 @@ Nodo analizarComida() {
     }
 
     //BEBIDA (OBLIGATORIA)
+    if (categoriaActual() != "BEBIDA") {
+        throw runtime_error("Error sintactico en el simbolo '" + palabras[pos] +
+            "' (posicion " + to_string(pos + 1) + "): " + razonFaltaBebida(categoriaActual()));
+    }
     comida.hijos.push_back(envolver("<Bebida>", match("BEBIDA", "una bebida")));
 
     return comida;
