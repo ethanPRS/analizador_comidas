@@ -23,6 +23,10 @@ Nodo match(string categoriaEsperada, string descripcion) {
         pos++;
         return hoja(palabraActual);
     } else {
+        // Si ya no quedan palabras, no se menciona la marca interna '$'
+        if (categoriaActual() == "FIN") {
+            throw std::runtime_error("Error sintáctico: la cadena terminó y se esperaba " + descripcion);
+        }
         throw std::runtime_error("Error sintáctico en el símbolo '" + palabras[pos] +
       "' (posición " + std::to_string(pos + 1) + "): se esperaba " + descripcion);
 
@@ -59,18 +63,18 @@ Nodo analizarComida() {
     comida.hijos.push_back(envolver("<Proteina>", match("PROTEINA", "una proteina")));
 
     // + (después de la proteína siempre va un +)
-    comida.hijos.push_back(match("Y", "el separador '+'"));
+    comida.hijos.push_back(match("Y", "el separador '+' y una bebida"));
     
     //ACOMPANAMIENTO (OPCIONAL)
     if (categoriaActual() == "GUARN1" || categoriaActual() == "GUARN2" || categoriaActual() == "ENTRADA" || categoriaActual() == "SOPA" || categoriaActual() == "POSTRE") {
         comida.hijos.push_back(analizarAcomp());
-        comida.hijos.push_back(match("Y", "el separador '+'"));
+        comida.hijos.push_back(match("Y", "el separador '+' y una bebida"));
     }
 
     //BEBIDA (OBLIGATORIA)
     if (categoriaActual() != "BEBIDA") {
-        throw runtime_error("Error sintactico en el simbolo '" + palabras[pos] +
-            "' (posicion " + to_string(pos + 1) + "): " + razonFaltaBebida(categoriaActual()));
+        throw runtime_error("Error sintáctico en el símbolo '" + palabras[pos] +
+            "' (posición " + to_string(pos + 1) + "): " + razonFaltaBebida(categoriaActual()));
     }
     comida.hijos.push_back(envolver("<Bebida>", match("BEBIDA", "una bebida")));
 
@@ -143,8 +147,8 @@ Nodo analizarAcomp() {
     } else if (iniciaComplemento(categoriaActual())) {
         acomp.hijos.push_back(analizarComplemento());
     } else {
-        throw runtime_error("Error sintactico en el simbolo '" + palabras[pos] +
-            "' (posicion " + to_string(pos + 1) + "): se esperaba guarnicion, entrada o postre");
+        throw runtime_error("Error sintáctico en el símbolo '" + palabras[pos] +
+            "' (posición " + to_string(pos + 1) + "): se esperaba guarnicion, entrada o postre");
     }
     return acomp;
 }
@@ -157,7 +161,7 @@ Nodo analizarCadena(const vector<string> &tokens) {
     }
     for (size_t i = 0; i + 1 < tokens.size(); ++i) {
         if (tokens[i] == "$") {
-            throw runtime_error("El simbolo '$' (posicion " + to_string(i + 1) +
+            throw runtime_error("El símbolo '$' (posición " + to_string(i + 1) +
                 ") esta reservado para el fin interno de la cadena");
         }
     }
@@ -165,8 +169,8 @@ Nodo analizarCadena(const vector<string> &tokens) {
     pos = 0;
     Nodo arbol = analizarComida();
     if (categoriaActual() != "FIN" || static_cast<size_t>(pos) != palabras.size() - 1) {
-        throw runtime_error("Error sintactico en el simbolo '" + palabras[pos] +
-            "' (posicion " + to_string(pos + 1) + "): no se permiten componentes despues de la bebida");
+        throw runtime_error("Error sintáctico en el símbolo '" + palabras[pos] +
+            "' (posición " + to_string(pos + 1) + "): no se permiten componentes despues de la bebida");
     }
     return arbol;
 }

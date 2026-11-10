@@ -21,7 +21,7 @@ vector<string> analizadorLexico(string &comida) {
 
   while (flujo >> palabra) { // Separa por espacios
     if (alfabeto.count(palabra) == 0) {
-      throw runtime_error("El simbolo '" + palabra + "' (posición " +
+      throw runtime_error("El símbolo '" + palabra + "' (posición " +
                           to_string(pos) + ") no pertenece al alfabeto");
     }
     palabras.push_back(palabra);
